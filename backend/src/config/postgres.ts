@@ -40,15 +40,12 @@ export const connectPostgres = async () => {
     await sequelize.authenticate();
     console.log('✅ PostgreSQL connected successfully');
 
-    // Sync models (use migrations in production)
-    if (process.env.NODE_ENV !== 'production') {
-      await sequelize.sync({ force: true }); // WARNING: This drops tables!
-      console.log('✅ Database models synchronized');
-    } else {
-      // In production, sync without force to preserve data
-      await sequelize.sync({ alter: false });
-      console.log('✅ Database models verified');
-    }
+    // Sync models (creates tables if they don't exist)
+    // WARNING: force:true drops existing tables! Use only for development/first deployment
+    await sequelize.sync({ force: true, alter: false });
+    console.log('✅ Database synchronized');
+
+    return sequelize;
   } catch (error) {
     console.error('❌ PostgreSQL connection error:', error);
     throw error;
