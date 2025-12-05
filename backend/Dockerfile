@@ -3,7 +3,7 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 RUN npm run build
@@ -15,7 +15,7 @@ WORKDIR /app
 RUN apk add --no-cache curl
 
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --only=production
 
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/uploads ./uploads
