@@ -1,332 +1,542 @@
-# ChargerBNB - EV Charging Station Marketplace
+# ChargerBNB - Complete Project Documentation
 
-A full-stack marketplace platform where Indian hosts can list their electric vehicle chargers and users can rent them by the hour or session.
+**Project:** EV Charging Marketplace Platform  
+**Team:** Diwakar Patel (2306411530012) & Aditya Dubey (2306411530002)  
+**Live:** https://chargerbnb-ev.netlify.app  
+**API:** https://chargerbnb-fullstack.onrender.com  
+**GitHub:** https://github.com/diwakar453t/chargerbnb-fullstack
 
-## Tech Stack
+---
 
-### Backend
-- **Java 21** with **Spring Boot 3.2**
-- **PostgreSQL** database
-- **JWT** authentication
-- **Razorpay** payment integration (UPI, Cards, Wallets)
-- **Docker** containerization
+## Quick Start Guide
 
-### Frontend
-- **Angular 17** with standalone components
-- **Angular Material** UI components
-- **Google Maps** integration
-- **i18n** support (English, Hindi, Tamil, Telugu)
-- **Responsive** mobile-first design
+### Prerequisites
+- Node.js 18+
+- PostgreSQL 14+
+- Git
 
-## Features
+### Local Setup (5 Minutes)
 
-### Core Features
-- ✅ User & Host authentication (separate dashboards)
-- ✅ Charger listings with specifications and maps
-- ✅ Booking calendar and time slot management
-- ✅ UPI-based payments via Razorpay
-- ✅ Reviews and ratings system
-- ✅ Host verification workflow (Aadhaar OTP/document upload)
-- ✅ Admin dashboard for managing users/hosts/listings
-- ✅ Multi-language support (English, Hindi, Tamil, Telugu)
+```bash
+# Clone repository
+git clone https://github.com/diwakar453t/chargerbnb-fullstack.git
+cd chargerbnb-fullstack
 
-### Enhanced Features
-- ✅ **Refresh Token Mechanism** - Secure token refresh for extended sessions
-- ✅ **Email/SMS Notifications** - Booking confirmations, OTP, verification alerts
-- ✅ **File Upload Service** - Secure document and image uploads
-- ✅ **Analytics API** - Dashboard statistics for admins
-- ✅ **OpenAPI/Swagger Documentation** - Interactive API documentation
-- ✅ **Lazy Loading** - Optimized Angular module loading
-- ✅ **Geolocation Integration** - Auto-detect user location for nearby chargers
-- ✅ **Image Upload Components** - Drag-and-drop image uploads
-- ✅ **Notification Service** - Toast notifications for user feedback
-- ✅ **PWA Support** - Progressive Web App capabilities
-- ✅ **Docker Health Checks** - Container health monitoring
-- ✅ **Production Profiles** - Separate staging/production configurations
-- ✅ **Unit Tests** - Backend service tests with JUnit & Mockito
+# Backend setup
+cd backend
+npm install
+cp .env.example .env
+# Edit .env with your database credentials
+npm run dev
 
-## Prerequisites
+# Frontend setup (new terminal)
+cd frontend-react
+npm install
+cp .env.example .env
+# Edit REACT_APP_API_URL=http://localhost:5000/api
+npm start
+```
 
-- Java 21 JDK
-- Node.js 20+ and npm
-- Docker and Docker Compose
-- PostgreSQL (if running without Docker)
+**Access:** http://localhost:3000
 
-## Quick Start with Docker
+---
 
-1. **Clone and navigate to the project:**
-   ```bash
-   cd charger
-   ```
+## Project Overview
 
-2. **Start all services:**
-   ```bash
-   docker-compose up -d
-   ```
+ChargerBNB is a peer-to-peer marketplace connecting EV owners with charging station providers. Think "Airbnb for EV charging stations."
 
-3. **Access the application:**
-   - Frontend: http://localhost:4200
-   - Backend API: http://localhost:8080
-   - PostgreSQL: localhost:5432
+**Key Features:**
+- 🔐 Secure authentication with government ID verification
+- ⚡ Comprehensive charger listing (30+ specification fields)
+- 📍 Location-based search with distance calculation
+- 💰 Flexible pricing (hourly, per kWh, peak hours)
+- 📊 Real-time dashboard analytics
+- 🏠 Amenities tracking (WiFi, food, restrooms, games, security)
 
-## Manual Setup
+---
 
-### Backend Setup
+## Architecture
 
-1. **Navigate to backend directory:**
-   ```bash
-   cd backend
-   ```
+### Tech Stack
 
-2. **Configure database in `application.yml`:**
-   ```yaml
-   spring:
-     datasource:
-       url: jdbc:postgresql://localhost:5432/chargerbnb
-       username: postgres
-       password: postgres
-   ```
+**Frontend:**
+- React 18 + TypeScript
+- Material-UI v5
+- Axios for API calls
+- Context API for state
 
-3. **Set environment variables:**
-   ```bash
-   export JWT_SECRET=your-256-bit-secret-key-change-this-in-production
-   export RAZORPAY_KEY_ID=your-razorpay-key-id
-   export RAZORPAY_KEY_SECRET=your-razorpay-key-secret
-   ```
+**Backend:**
+- Node.js + Express + TypeScript
+- Sequelize ORM
+- PostgreSQL database
+- JWT authentication
+- Nodemailer for OTP
 
-4. **Build and run:**
-   ```bash
-   mvn clean package
-   java -jar target/chargerbnb-backend-1.0.0.jar
-   ```
+**Deployment:**
+- Frontend: Netlify
+- Backend + DB: Render
+- CI/CD: GitHub auto-deploy
 
-### Frontend Setup
+### System Architecture
 
-1. **Navigate to frontend directory:**
-   ```bash
-   cd frontend
-   ```
+```
+┌─────────────────┐
+│   Web Browser   │
+└────────┬────────┘
+         │ HTTPS
+┌────────▼─────────────────┐
+│  React App (Netlify)     │
+│  - Material-UI           │
+│  - JWT Token Storage     │
+└────────┬─────────────────┘
+         │ REST API
+┌────────▼──────────────────┐
+│  Express Server (Render)  │
+│  - Auth Middleware        │
+│  - Sequelize ORM          │
+└────────┬──────────────────┘
+         │
+┌────────▼──────────────────┐
+│  PostgreSQL (Render)      │
+│  - Users, Chargers        │
+│  - Bookings, Reviews      │
+└───────────────────────────┘
+```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+---
 
-3. **Update API URL in services** (if backend is not on localhost:8080):
-   - Edit `src/app/core/services/*.service.ts` files
-   - Change `apiUrl` to your backend URL
+## Database Schema
 
-4. **Run development server:**
-   ```bash
-   npm start
-   ```
+### Core Tables
 
-5. **Access the app:**
-   - Open http://localhost:4200
+**users**
+- id, email, password (hashed)
+- firstName, lastName, phoneNumber
+- role (USER/HOST/ADMIN)
+- aadhaarNumber, panNumber (for hosts)
+- address, city, state, pincode
 
-## API Endpoints
+**chargers**
+- id, hostId (FK)
+- title, description, chargerType
+- powerRating, chargingSpeed, numPorts
+- pricePerHour, pricePerKWh
+- address, city, state, latitude, longitude
+- amenities (JSONB), images (ARRAY)
+- isAvailable, isApproved
+
+**bookings**
+- id, userId (FK), chargerId (FK)
+- startTime, endTime, totalCost
+- status, paymentStatus
+
+---
+
+## API Documentation
 
 ### Authentication
-- `POST /api/auth/signup` - User/Host registration
-- `POST /api/auth/login` - Login
+
+**POST /api/auth/signup**
+```json
+{
+  "email": "user@example.com",
+  "password": "Test@12345",
+  "firstName": "John",
+  "lastName": "Doe",
+  "phoneNumber": "9876543210",
+  "role": "USER"
+}
+```
+
+**POST /api/auth/login**
+```json
+{
+  "email": "user@example.com",
+  "password": "Test@12345"
+}
+```
+
+Response:
+```json
+{
+  "accessToken": "eyJhbGci...",
+  "refreshToken": "eyJhbGci...",
+  "user": { "id": 1, "email": "...", "role": "USER" }
+}
+```
 
 ### Chargers
-- `GET /api/chargers/public` - Get all approved chargers
-- `GET /api/chargers/public/nearby` - Get nearby chargers
-- `GET /api/chargers/public/{id}` - Get charger details
-- `POST /api/chargers` - Create charger (Host only)
-- `GET /api/chargers/my-chargers` - Get host's chargers
-- `PUT /api/chargers/{id}` - Update charger
 
-### Bookings
-- `POST /api/bookings` - Create booking
-- `GET /api/bookings/my-bookings` - Get user bookings
-- `GET /api/bookings/charger/{chargerId}` - Get charger bookings
+**POST /api/chargers** (HOST only)
+```json
+{
+  "title": "Fast Charger - Mumbai",
+  "chargerType": "Type-2",
+  "powerRating": 7,
+  "pricePerHour": 100,
+  "address": "123 Main St",
+  "city": "Mumbai",
+  "state": "Maharashtra",
+  "pincode": "400001",
+  "latitude": "19.0760",
+  "longitude": "72.8777",
+  "amenities": {
+    "food": true,
+    "wifi": true,
+    "available24x7": true
+  }
+}
+```
 
-### Payments
-- `POST /api/payments/create-order` - Create Razorpay order
-- `POST /api/payments/verify` - Verify payment
+**GET /api/chargers/public?city=Mumbai**
 
-### Reviews
-- `POST /api/reviews` - Create review
-- `GET /api/reviews/charger/{chargerId}` - Get charger reviews
+**GET /api/chargers/my-chargers** (HOST only)
 
-### Admin
-- `GET /api/admin/users` - Get all users
-- `GET /api/admin/hosts` - Get all hosts
-- `PUT /api/admin/hosts/{id}/verify` - Verify host
-- `PUT /api/admin/chargers/{id}/approve` - Approve charger
-- `GET /api/admin/chargers/pending` - Get pending chargers
-- `GET /api/admin/analytics/dashboard` - Get dashboard statistics
-- `GET /api/admin/analytics/bookings` - Get booking statistics
+---
 
-### File Upload
-- `POST /api/upload/image` - Upload image file
-- `POST /api/upload/document` - Upload document file
+## Security Features
 
-### Authentication
-- `POST /api/auth/refresh` - Refresh access token
-- `POST /api/auth/logout` - Logout and revoke tokens
+### Password Requirements
+- Minimum 10 characters
+- 1 uppercase letter
+- 1 lowercase letter
+- 1 number
+- 1 special character (@$!%*?&#)
 
-## Configuration
+Example: `MyPass@2024`
 
-### Razorpay Setup
+### Government ID Validation (Hosts)
+- **Aadhaar:** 12 digits, starts with 2-9 (e.g., 234567890123)
+- **PAN:** 5 letters + 4 digits + 1 letter (e.g., ABCDE1234F)
 
-1. Sign up at https://razorpay.com
-2. Get your Key ID and Key Secret from dashboard
-3. Update environment variables:
-   ```bash
-   RAZORPAY_KEY_ID=your-key-id
-   RAZORPAY_KEY_SECRET=your-key-secret
+### Token Security
+- Access Token: 24 hours
+- Refresh Token: 7 days
+- bcrypt hashing (10 salt rounds)
+- JWT with strong secret
+
+---
+
+## Deployment Guide
+
+### Frontend (Netlify)
+
+1. **Connect GitHub**
+   - Login to Netlify → New Site → Import from Git
+   - Select repository
+
+2. **Build Settings**
+   ```
+   Build command: cd frontend-react && npm run build
+   Publish directory: frontend-react/build
    ```
 
-### Google Maps Setup
-
-1. Get API key from Google Cloud Console
-2. Add to `frontend/src/index.html`:
-   ```html
-   <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+3. **Environment Variables**
+   ```
+   REACT_APP_API_URL=https://chargerbnb-fullstack.onrender.com/api
    ```
 
-### Email Configuration
+4. **Deploy**
+   - Automatic deployment on git push
 
-1. Configure SMTP settings in `application.yml`:
-   ```yaml
-   spring:
-     mail:
-       host: smtp.gmail.com
-       port: 587
-       username: your-email@gmail.com
-       password: your-app-password
+### Backend (Render)
+
+1. **Create Web Service**
+   - New → Web Service
+   - Connect GitHub repository
+
+2. **Settings**
+   ```
+   Name: chargerbnb-backend
+   Environment: Node
+   Build Command: cd backend && npm install && npm run build
+   Start Command: cd backend && npm start
    ```
 
-### Swagger/OpenAPI
+3. **Environment Variables**
+   ```
+   NODE_ENV=production
+   DATABASE_URL=<Render PostgreSQL URL>
+   JWT_SECRET=<random-strong-secret>
+   JWT_REFRESH_SECRET=<random-strong-secret>
+   CORS_ORIGIN=https://chargerbnb-ev.netlify.app
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=<your-email>
+   SMTP_PASSWORD=<app-password>
+   ```
 
-Access API documentation at:
-- **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **OpenAPI JSON**: http://localhost:8080/v3/api-docs
+4. **Database**
+   - New → PostgreSQL
+   - Copy DATABASE_URL to backend env vars
+
+---
+
+## Features Implementation
+
+### User Features
+✅ Signup/Login with email verification
+✅ Search chargers by location
+✅ Filter by type, price, amenities
+✅ View detailed charger profiles
+✅ Book charging sessions
+✅ View booking history
+✅ Dashboard with statistics
+✅ Favorite chargers
+
+### Host Features
+✅ Government ID verification
+✅ Add charger with full specifications
+✅ Set flexible pricing
+✅ Manage charger availability
+✅ View earnings analytics
+✅ Edit/delete chargers
+✅ Booking management
+✅ Performance dashboard
+
+### Admin Features (Future)
+- Approve/reject charger listings
+- Manage users
+- Platform analytics
+- Dispute resolution
+
+---
+
+## Testing
+
+### Manual Testing Checklist
+
+**Authentication:**
+- [x] Signup as USER
+- [x] Signup as HOST with Aadhaar/PAN
+- [x] Login with valid credentials
+- [x] Login with invalid credentials (should fail)
+- [x] Password reset via OTP
+
+**Charger Management:**
+- [x] Add new charger (HOST)
+- [x] View charger list
+- [x] Edit charger details
+- [x] Delete charger
+- [x] Search by location
+
+**Dashboard:**
+- [x] USER dashboard loads
+- [x] HOST dashboard loads
+- [x] Stats display correctly
+- [x] Booking history shows
+
+### API Testing (Postman)
+
+```bash
+# Health check
+curl https://chargerbnb-fullstack.onrender.com/health
+
+# Get public chargers
+curl https://chargerbnb-fullstack.onrender.com/api/chargers/public
+
+# Login
+curl -X POST https://chargerbnb-fullstack.onrender.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"Test@12345"}'
+```
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+**1. "Validation error" during signup**
+- Check password meets requirements (10+ chars, special chars)
+- Ensure email/phone not already registered
+- For HOST: verify Aadhaar (12 digits, starts 2-9) and PAN format
+
+**2. "Failed to create charger"**
+- Ensure logged in as HOST
+- Check all required fields filled
+- Verify latitude/longitude format (strings)
+
+**3. Backend not connecting to database**
+- Check DATABASE_URL in Render environment
+- Ensure database is running
+- Check connection limits
+
+**4. CORS errors**
+- Verify CORS_ORIGIN matches frontend URL
+- Check API_URL in frontend .env
+
+**5. Build fails**
+- Clear node_modules: `rm -rf node_modules && npm install`
+- Check Node.js version (18+)
+- Review build logs for specific errors
+
+---
+
+## Future Enhancements
+
+### Phase 1 (Next 3 months)
+- [ ] Payment integration (Razorpay/Stripe)
+- [ ] Image upload for chargers
+- [ ] Google Maps integration
+- [ ] Real-time availability (WebSockets)
+- [ ] Review & rating system
+
+### Phase 2 (6 months)
+- [ ] Mobile apps (React Native)
+- [ ] AI-based recommendations
+- [ ] Route planning integration
+- [ ] Dynamic pricing
+- [ ] Push notifications
+
+### Phase 3 (1 year)
+- [ ] IoT charger integration
+- [ ] Corporate fleet management
+- [ ] Multi-language support
+- [ ] Analytics dashboard (Admin)
+- [ ] Subscription plans
+
+---
 
 ## Project Structure
 
 ```
-charger/
+chargerbnb-fullstack/
 ├── backend/
-│   ├── src/main/java/com/chargerbnb/
-│   │   ├── model/          # JPA entities
-│   │   ├── repository/      # Data repositories
-│   │   ├── service/         # Business logic
-│   │   ├── controller/      # REST controllers
-│   │   ├── dto/            # Data transfer objects
-│   │   └── security/       # JWT & security config
-│   └── Dockerfile
-├── frontend/
-│   ├── src/app/
-│   │   ├── core/           # Services, guards, interceptors
-│   │   └── pages/         # Components
-│   └── Dockerfile
-└── docker-compose.yml
+│   ├── src/
+│   │   ├── config/
+│   │   │   ├── postgres.ts
+│   │   │   └── mongodb.ts
+│   │   ├── models/
+│   │   │   └── postgres/
+│   │   │       ├── User.model.ts
+│   │   │       ├── Charger.model.ts
+│   │   │       ├── Booking.model.ts
+│   │   │       └── OTP.model.ts
+│   │   ├── routes/
+│   │   │   ├── auth.routes.ts
+│   │   │   ├── charger.routes.ts
+│   │   │   ├── booking.routes.ts
+│   │   │   └── otp.routes.ts
+│   │   ├── middleware/
+│   │   │   └── auth.middleware.ts
+│   │   ├── services/
+│   │   │   └── email.service.ts
+│   │   └── server.ts
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── frontend-react/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   └── ProtectedRoute.tsx
+│   │   ├── pages/
+│   │   │   ├── Home.tsx
+│   │   │   ├── Signup.tsx
+│   │   │   ├── Login.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── HostDashboard.tsx
+│   │   │   ├── AddCharger.tsx
+│   │   │   └── ForgotPassword.tsx
+│   │   ├── context/
+│   │   │   └── AuthContext.tsx
+│   │   ├── App.tsx
+│   │   └── index.tsx
+│   └── package.json
+│
+└── README.md (this file)
 ```
 
-## Development
-
-### Running Tests
-
-**Backend:**
-```bash
-cd backend
-mvn test
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm test
-```
-
-### API Testing
-
-Import the Postman collection from `ChargerBNB.postman_collection.json`:
-1. Open Postman
-2. Import the collection file
-3. Set `baseUrl` variable to `http://localhost:8080/api`
-4. Login to get `accessToken` and `refreshToken` automatically set
-
-### Health Checks
-
-Check service health:
-- **Backend**: http://localhost:8080/actuator/health
-- **Frontend**: http://localhost:4200 (check HTTP status)
-
-### Production Deployment
-
-1. Set Spring profile to `prod`:
-   ```bash
-   export SPRING_PROFILES_ACTIVE=prod
-   ```
-
-2. Update production configuration in `application-prod.yml`
-
-3. Use Docker Compose for production:
-   ```bash
-   docker-compose -f docker-compose.yml up -d
-   ```
-
-### Building for Production
-
-**Backend:**
-```bash
-cd backend
-mvn clean package -DskipTests
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm run build
-```
+---
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+### Development Workflow
+
+1. **Fork the repository**
+2. **Create feature branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. **Make changes and commit**
+   ```bash
+   git add .
+   git commit -m "feat: add new feature"
+   ```
+4. **Push and create PR**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+
+### Commit Message Format
+
+```
+type: subject
+
+body (optional)
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Formatting
+- `refactor`: Code restructuring
+- `test`: Tests
+- `chore`: Maintenance
+
+---
+
+## Team
+
+**Developers:**
+- Diwakar Patel - Full Stack Development
+- Aditya Dubey - Full Stack Development
+
+**Contact:**
+- Email: diwakar453t@gmail.com
+- GitHub: https://github.com/diwakar453t
+
+---
 
 ## License
 
-MIT License
+This project is developed as an academic project. All rights reserved.
 
-## Documentation
+---
 
-- **API Documentation**: See Swagger UI at http://localhost:8080/swagger-ui.html
-- **Security Considerations**: See [SECURITY.md](SECURITY.md)
-- **Postman Collection**: Import `ChargerBNB.postman_collection.json` for API testing
+## Acknowledgments
 
-## Testing
+- React.js documentation and community
+- Material-UI for the component library
+- Node.js and Express.js ecosystems
+- PostgreSQL and Sequelize teams
+- Netlify and Render for hosting platforms
+- Ministry of Heavy Industries (FAME India scheme) for EV adoption vision
 
-### Backend Unit Tests
-- Service layer tests with Mockito
-- Example: `AuthServiceTest.java`
-- Run with: `mvn test`
+---
 
-### Frontend Tests
-- Component tests with Jasmine/Karma
-- E2E tests (to be implemented with Cypress)
+## Changelog
 
-## Security
+### Version 2.0.0 (Current)
+- ✅ Complete dashboard implementation
+- ✅ Add Charger form with 30+ fields
+- ✅ Government ID verification
+- ✅ Location-based search
+- ✅ Production deployment
+- ✅ Professional UI/UX
 
-See [SECURITY.md](SECURITY.md) for:
-- Authentication & authorization details
-- Host verification process
-- File upload security
-- Payment security
-- Production security checklist
+### Version 1.0.0
+- ✅ Basic authentication
+- ✅ Simple charger listing
+- ✅ Basic booking system
+- ✅ Initial deployment
 
-## Support
+---
 
-For issues and questions, please open an issue on GitHub.
-
-## License
-
-MIT License
-
+**Last Updated:** December 2024  
+**Status:** ✅ Production Ready  
+**Version:** 2.0.0-security-enhanced
