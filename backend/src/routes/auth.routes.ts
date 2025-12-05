@@ -12,9 +12,9 @@ router.post('/signup',
   [
     body('email').isEmail().normalizeEmail(),
     body('password')
-      .isLength({ min: 12 })
-      .withMessage('Password must be at least 12 characters')
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{12,}$/)
+      .isLength({ min: 10 })
+      .withMessage('Password must be at least 10 characters')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{10,}$/)
       .withMessage('Password must contain uppercase, lowercase, number, and special character'),
     body('firstName').trim().notEmpty(),
     body('phoneNumber').matches(/^[0-9]{10,11}$/),
