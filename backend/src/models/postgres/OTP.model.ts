@@ -1,5 +1,5 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/postgres';
+import sequelize from '../../config/postgres';
 
 interface OTPAttributes {
     id?: number;
