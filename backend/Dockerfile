@@ -18,7 +18,9 @@ COPY package*.json ./
 RUN npm install --only=production
 
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/uploads ./uploads
+
+# Create uploads directory at runtime
+RUN mkdir -p ./uploads
 
 EXPOSE 5000
 
