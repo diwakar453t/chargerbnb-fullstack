@@ -13,7 +13,7 @@ router.post('/signup',
     body('email').isEmail().normalizeEmail(),
     body('password').isLength({ min: 8 }).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
     body('firstName').trim().notEmpty(),
-    body('phoneNumber').matches(/^[6-9]\d{9}$/),
+    body('phoneNumber').matches(/^[0-9]{10,11}$/),
     body('role').isIn(['USER', 'HOST'])
   ],
   async (req, res) => {
