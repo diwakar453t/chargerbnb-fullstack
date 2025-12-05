@@ -11,10 +11,23 @@ const router = express.Router();
 router.post('/signup',
   [
     body('email').isEmail().normalizeEmail(),
-    body('password').isLength({ min: 8 }).matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/),
+    body('password')
+      .isLength({ min: 12 })
+      .withMessage('Password must be at least 12 characters')
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{12,}$/)
+      .withMessage('Password must contain uppercase, lowercase, number, and special character'),
     body('firstName').trim().notEmpty(),
     body('phoneNumber').matches(/^[0-9]{10,11}$/),
-    body('role').isIn(['USER', 'HOST'])
+    body('role').isIn(['USER', 'HOST']),
+    // Conditional validation for HOST role
+    body('aadhaarNumber')
+      .if(body('role').equals('HOST'))
+      .matches(/^[2-9]{1}[0-9]{11}$/)
+      .withMessage('Aadhaar must be 12 digits starting with 2-9'),
+    body('panNumber')
+      .if(body('role').equals('HOST'))
+      .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)
+      .withMessage('PAN must be in format: ABCDE1234F')
   ],
   async (req, res) => {
     try {
