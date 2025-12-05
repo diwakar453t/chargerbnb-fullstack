@@ -1,130 +1,140 @@
-import express from 'express';
+import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import Charger from '../models/postgres/Charger.model';
-import { authenticateToken, authorizeRoles } from '../middleware/auth.middleware';
-import { Op } from 'sequelize';
+import { authenticate } from '../middleware/auth.middleware';
 
-const router = express.Router();
+const router = Router();
 
-// Get all approved chargers (public)
-router.get('/public', async (req, res) => {
+// Get all chargers (with optional filters)
+router.get('/', async (req, res) => {
   try {
-    const { latitude, longitude, radiusKm = 10 } = req.query;
+    const { city, state, chargerType, available } = req.query;
+    const where: any = {};
 
-    let chargers;
+    if (city) where.city = city;
+    if (state) where.state = state;
+    if (chargerType) where.chargerType = chargerType;
+    if (available) where.isAvailable = available === 'true';
 
-    if (latitude && longitude) {
-      // Find nearby chargers using Haversine formula
-      const lat = parseFloat(latitude as string);
-      const lng = parseFloat(longitude as string);
-      const radius = parseFloat(radiusKm as string);
-
-      chargers = await Charger.findAll({
-        where: {
-          isApproved: true,
-          isAvailable: true
-        },
-        include: [{ association: 'host', attributes: ['id', 'firstName', 'lastName'] }]
-      });
-
-      // Filter by distance (simplified - use PostGIS in production)
-      chargers = chargers.filter((charger: any) => {
-        const distance = calculateDistance(
-          lat,
-          lng,
-          parseFloat(charger.latitude),
-          parseFloat(charger.longitude)
-        );
-        return distance <= radius;
-      });
-    } else {
-      chargers = await Charger.findAll({
-        where: {
-          isApproved: true,
-          isAvailable: true
-        },
-        include: [{ association: 'host', attributes: ['id', 'firstName', 'lastName'] }]
-      });
-    }
-
-    res.json(chargers);
+    const chargers = await Charger.findAll({ where });
+    res.json({ chargers });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Get chargers error:', error);
+    res.status(500).json({ error: 'Failed to fetch chargers' });
   }
 });
 
 // Get charger by ID
-router.get('/public/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const charger = await Charger.findByPk(req.params.id, {
-      include: [{ association: 'host', attributes: ['id', 'firstName', 'lastName'] }]
-    });
-
+    const charger = await Charger.findByPk(req.params.id);
     if (!charger) {
       return res.status(404).json({ error: 'Charger not found' });
     }
-
-    res.json(charger);
+    res.json({ charger });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Get charger error:', error);
+    res.status(500).json({ error: 'Failed to fetch charger' });
   }
 });
 
-// Create charger (host only)
-router.post('/',
-  authenticateToken,
-  authorizeRoles('HOST', 'ADMIN'),
+// Create charger (HOST only)
+router.post(
+  '/',
+  authenticate,
   [
-    body('title').trim().notEmpty(),
-    body('powerRating').isFloat({ min: 0 }),
-    body('pricePerHour').isFloat({ min: 0 }),
-    body('latitude').isFloat(),
-    body('longitude').isFloat()
+    body('title').notEmpty().withMessage('Title is required'),
+    body('chargerType').notEmpty().withMessage('Charger type is required'),
+    body('powerRating').isNumeric().withMessage('Power rating must be a number'),
+    body('pricePerHour').isNumeric().withMessage('Price per hour must be a number'),
+    body('address').notEmpty().withMessage('Address is required'),
+    body('city').notEmpty().withMessage('City is required'),
+    body('state').notEmpty().withMessage('State is required'),
+    body('pincode').notEmpty().withMessage('Pincode is required'),
   ],
-  async (req, res) => {
+  async (req: any, res) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
 
+      // Check if user is HOST
+      if (req.user.role !== 'HOST') {
+        return res.status(403).json({ error: 'Only hosts can add chargers' });
+      }
+
       const chargerData = {
         ...req.body,
-        hostId: req.user!.userId,
-        isApproved: req.user!.role === 'ADMIN'
+        hostId: req.user.userId,
+        isAvailable: true,
+        isApproved: false, // Requires admin approval
       };
 
       const charger = await Charger.create(chargerData);
-      res.status(201).json(charger);
+      res.status(201).json({ message: 'Charger created successfully', charger });
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
+      console.error('Create charger error:', error);
+      res.status(500).json({ error: 'Failed to create charger' });
     }
   }
 );
 
-// Get my chargers
-router.get('/my-chargers', authenticateToken, async (req, res) => {
+// Update charger (HOST only - own chargers)
+router.put('/:id', authenticate, async (req: any, res) => {
   try {
-    const chargers = await Charger.findAll({
-      where: { hostId: req.user!.userId }
-    });
-    res.json(chargers);
+    const charger = await Charger.findByPk(req.params.id);
+
+    if (!charger) {
+      return res.status(404).json({ error: 'Charger not found' });
+    }
+
+    // Check if user owns this charger
+    if (charger.hostId !== req.user.userId) {
+      return res.status(403).json({ error: 'Not authorized to edit this charger' });
+    }
+
+    await charger.update(req.body);
+    res.json({ message: 'Charger updated successfully', charger });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error('Update charger error:', error);
+    res.status(500).json({ error: 'Failed to update charger' });
   }
 });
 
-// Helper function to calculate distance
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371; // Earth's radius in km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
+// Delete charger (HOST only - own chargers)
+router.delete('/:id', authenticate, async (req: any, res) => {
+  try {
+    const charger = await Charger.findByPk(req.params.id);
+
+    if (!charger) {
+      return res.status(404).json({ error: 'Charger not found' });
+    }
+
+    // Check if user owns this charger
+    if (charger.hostId !== req.user.userId) {
+      return res.status(403).json({ error: 'Not authorized to delete this charger' });
+    }
+
+    await charger.destroy();
+    res.json({ message: 'Charger deleted successfully' });
+  } catch (error: any) {
+    console.error('Delete charger error:', error);
+    res.status(500).json({ error: 'Failed to delete charger' });
+  }
+});
+
+// Get host's chargers
+router.get('/host/my-chargers', authenticate, async (req: any, res) => {
+  try {
+    const chargers = await Charger.findAll({
+      where: { hostId: req.user.userId }
+    });
+    res.json({ chargers });
+  } catch (error: any) {
+    console.error('Get host chargers error:', error);
+    res.status(500).json({ error: 'Failed to fetch chargers' });
+  }
+});
 
 export default router;
-
