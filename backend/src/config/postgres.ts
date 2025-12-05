@@ -40,9 +40,8 @@ export const connectPostgres = async () => {
     await sequelize.authenticate();
     console.log('✅ PostgreSQL connected successfully');
 
-    // Sync models (creates tables if they don't exist)
-    // WARNING: force:true drops existing tables! Use only for development/first deployment
-    await sequelize.sync({ force: true, alter: false });
+    // Sync models - alter adds new columns without dropping tables
+    await sequelize.sync({ alter: true });
     console.log('✅ Database synchronized');
 
     return sequelize;
