@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import Charger from '../models/postgres/Charger.model';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticateToken } from '../middleware/auth.middleware';
 
 const router = Router();
 
@@ -41,7 +41,7 @@ router.get('/:id', async (req, res) => {
 // Create charger (HOST only)
 router.post(
   '/',
-  authenticate,
+  authenticateToken,
   [
     body('title').notEmpty().withMessage('Title is required'),
     body('chargerType').notEmpty().withMessage('Charger type is required'),
@@ -81,7 +81,7 @@ router.post(
 );
 
 // Update charger (HOST only - own chargers)
-router.put('/:id', authenticate, async (req: any, res) => {
+router.put('/:id', authenticateToken, async (req: any, res) => {
   try {
     const charger = await Charger.findByPk(req.params.id);
 
@@ -103,7 +103,7 @@ router.put('/:id', authenticate, async (req: any, res) => {
 });
 
 // Delete charger (HOST only - own chargers)
-router.delete('/:id', authenticate, async (req: any, res) => {
+router.delete('/:id', authenticateToken, async (req: any, res) => {
   try {
     const charger = await Charger.findByPk(req.params.id);
 
@@ -125,7 +125,7 @@ router.delete('/:id', authenticate, async (req: any, res) => {
 });
 
 // Get host's chargers
-router.get('/host/my-chargers', authenticate, async (req: any, res) => {
+router.get('/host/my-chargers', authenticateToken, async (req: any, res) => {
   try {
     const chargers = await Charger.findAll({
       where: { hostId: req.user.userId }
