@@ -198,5 +198,76 @@ router.get('/me', authenticateToken, async (req, res) => {
   }
 });
 
+// Forgot password - send OTP
+router.post('/forgot-password',
+  [body('email').isEmail().normalizeEmail()],
+  async (req, res) => {
+    try {
+      const { email } = req.body;
+      const user = await User.findOne({ where: { email } });
+
+      if (!user) {
+        return res.json({ message: 'If email exists, reset OTP has been sent' });
+      }
+
+      const OTP = (await import('../models/postgres/OTP.model')).default;
+      const emailService = await import('../services/email.service');
+
+      const otp = emailService.generateOTP();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+      await OTP.destroy({ where: { email } });
+      await OTP.create({ email, otp, expiresAt, verified: false });
+      await emailService.sendOTPEmail(email, otp);
+
+      res.json({ message: 'If email exists, reset OTP has been sent' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+);
+
+// Reset password with OTP
+router.post('/reset-password',
+  [
+    body('email').isEmail().normalizeEmail(),
+    body('otp').isLength({ min: 6, max: 6 }),
+    body('newPassword')
+      .isLength({ min: 12 })
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{12,}$/)
+  ],
+  async (req, res) => {
+    try {
+      const { email, otp, newPassword } = req.body;
+
+      const OTP = (await import('../models/postgres/OTP.model')).default;
+      const { Op } = await import('sequelize');
+
+      const otpRecord = await OTP.findOne({
+        where: { email, otp, verified: false, expiresAt: { [Op.gt]: new Date() } }
+      });
+
+      if (!otpRecord) {
+        return res.status(400).json({ error: 'Invalid or expired OTP' });
+      }
+
+      const user = await User.findOne({ where: { email } });
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      user.password = await bcrypt.hash(newPassword, 10);
+      await user.save();
+
+      otpRecord.verified = true;
+      await otpRecord.save();
+
+      res.json({ message: 'Password reset successful' });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+);
+
 export default router;
 
