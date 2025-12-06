@@ -11,6 +11,7 @@ import reviewRoutes from './routes/review.routes';
 import uploadRoutes from './routes/upload.routes';
 import adminRoutes from './routes/admin.routes';
 import otpRoutes from './routes/otp.routes';
+import setupRoutes from './routes/setup.routes';
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/setup', setupRoutes);
 
 // Health check endpoint - Last deployed: 2025-12-06T10:21:04+05:30
 app.get('/health', (req, res) => {
