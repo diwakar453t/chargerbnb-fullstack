@@ -41,6 +41,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ReportsTab from '../components/admin/ReportsTab';
 import ReviewsTab from '../components/admin/ReviewsTab';
+import AnalyticsTab from '../components/admin/AnalyticsTab';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -378,13 +379,8 @@ const AdminDashboard: React.FC = () => {
             {/* Reviews Tab */}
             {tabValue === 2 && <ReviewsTab />}
 
-            {tabValue === 3 && (
-                <Paper sx={{ p: 4, textAlign: 'center' }}>
-                    <Typography variant="h6" color="text.secondary">
-                        Analytics dashboard coming soon...
-                    </Typography>
-                </Paper>
-            )}
+            {/* Analytics Tab */}
+            {tabValue === 3 && <AnalyticsTab />}
 
             {/* Charger Detail Dialog */}
             <Dialog open={detailDialogOpen} onClose={() => setDetailDialogOpen(false)} maxWidth="md" fullWidth>
