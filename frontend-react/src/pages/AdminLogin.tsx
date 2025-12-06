@@ -42,15 +42,13 @@ const AdminLogin: React.FC = () => {
                 return;
             }
 
-            // Store tokens
+            // Store tokens and user
             localStorage.setItem('accessToken', accessToken);
             localStorage.setItem('refreshToken', refreshToken);
             localStorage.setItem('user', JSON.stringify(user));
 
-            login(user, accessToken);
-
-            // Navigate to admin dashboard
-            navigate('/admin/dashboard');
+            // Direct navigation to admin dashboard
+            window.location.href = '/admin/dashboard';
         } catch (err: any) {
             console.error('Admin login error:', err);
             setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
