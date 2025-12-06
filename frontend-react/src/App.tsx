@@ -71,6 +71,7 @@ function AppRoutes() {
       <Route path="/add-charger" element={<ProtectedRoute><AddCharger /></ProtectedRoute>} />
 
       {/* Admin Routes */}
+      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route
         path="/admin/dashboard"
@@ -95,14 +96,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute requiredRole="HOST">
             <HostDashboard />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute requiredRole="ADMIN">
-            <AdminDashboard />
           </ProtectedRoute>
         }
       />

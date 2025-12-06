@@ -59,8 +59,8 @@ router.post(
         return res.status(400).json({ errors: errors.array() });
       }
 
-      // Check if user is HOST
-      if (req.user.role !== 'HOST') {
+      // Check if user is HOST or ADMIN (admin can test)
+      if (req.user.role !== 'HOST' && req.user.role !== 'ADMIN') {
         return res.status(403).json({ error: 'Only hosts can add chargers' });
       }
 
@@ -89,8 +89,8 @@ router.put('/:id', authenticateToken, async (req: any, res) => {
       return res.status(404).json({ error: 'Charger not found' });
     }
 
-    // Check if user owns this charger
-    if (charger.hostId !== req.user.userId) {
+    // Check if user owns this charger or is admin
+    if (charger.hostId !== req.user.userId && req.user.role !== 'ADMIN') {
       return res.status(403).json({ error: 'Not authorized to edit this charger' });
     }
 
@@ -111,8 +111,8 @@ router.delete('/:id', authenticateToken, async (req: any, res) => {
       return res.status(404).json({ error: 'Charger not found' });
     }
 
-    // Check if user owns this charger
-    if (charger.hostId !== req.user.userId) {
+    // Check if user owns this charger or is admin
+    if (charger.hostId !== req.user.userId && req.user.role !== 'ADMIN') {
       return res.status(403).json({ error: 'Not authorized to delete this charger' });
     }
 
