@@ -495,9 +495,40 @@ router.delete('/reviews/:id', async (req: Request, res: Response) => {
  */
 router.get('/stats/summary', async (req: Request, res: Response) => {
   try {
-    const pendingChargers = await Charger.count({ where: { isApproved: false } });
-    const approvedChargers = await Charger.count({ where: { isApproved: true } });
+    // Count chargers by ACTUAL status:
+    // Pending: Not approved yet AND available (waiting for approval)
+    const pendingChargers = await Charger.count({
+      where: {
+        isApproved: false,
+        isAvailable: true
+      }
+    });
+
+    // Approved: Approved and available
+    const approvedChargers = await Charger.count({
+      where: {
+        isApproved: true,
+        isAvailable: true
+      }
+    });
+
+    // Suspended/Rejected: Not available (admin suspended/rejected)
+    const rejectedChargers = await Charger.count({
+      where: {
+        isAvailable: false
+      }
+    });
+
+    // Total chargers
+    const totalChargers = await Charger.count();
+
+    // Active hosts
     const activeHosts = await User.count({ where: { role: 'HOST', isActive: true } });
+
+    // Total hosts (including inactive)
+    const totalHosts = await User.count({ where: { role: 'HOST' } });
+
+    // Open reports
     const openReports = await Report.count({ where: { status: 'OPEN' } });
 
     // Calculate average rating
@@ -509,7 +540,10 @@ router.get('/stats/summary', async (req: Request, res: Response) => {
     res.json({
       pendingChargers,
       approvedChargers,
+      rejectedChargers,
+      totalChargers,
       activeHosts,
+      totalHosts,
       openReports,
       avgRating: avgRating ? Number((avgRating as any).avgRating).toFixed(2) : 0
     });
