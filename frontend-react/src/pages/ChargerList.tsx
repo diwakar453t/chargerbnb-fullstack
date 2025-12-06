@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -43,11 +43,7 @@ const ChargerList: React.FC = () => {
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-  useEffect(() => {
-    fetchChargers();
-  }, [latitude, longitude]);
-
-  const fetchChargers = async () => {
+  const fetchChargers = useCallback(async () => {
     try {
       setLoading(true);
       let url = `${API_URL}/chargers/public`;
@@ -63,7 +59,11 @@ const ChargerList: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [latitude, longitude, API_URL]);
+
+  useEffect(() => {
+    fetchChargers();
+  }, [fetchChargers]);
 
   const filteredChargers = chargers.filter(
     (charger) =>

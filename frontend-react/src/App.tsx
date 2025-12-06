@@ -54,7 +54,6 @@ const theme = createTheme({
 });
 
 function AppRoutes() {
-  const { user } = useAuth();
 
   return (
     <Routes>

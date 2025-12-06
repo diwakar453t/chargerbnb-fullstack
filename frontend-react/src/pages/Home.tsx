@@ -14,7 +14,6 @@ import {
   Schedule,
   Payment,
   Star,
-  LocationOn,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import Footer from '../components/Footer';

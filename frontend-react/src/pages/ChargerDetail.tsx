@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Container,
   Grid,
   Card,
   CardMedia,
-  CardContent,
   Typography,
   Button,
   Box,
@@ -30,11 +29,7 @@ const ChargerDetail: React.FC = () => {
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
   const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '';
 
-  useEffect(() => {
-    fetchCharger();
-  }, [id]);
-
-  const fetchCharger = async () => {
+  const fetchCharger = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/chargers/public/${id}`);
       setCharger(response.data);
@@ -44,7 +39,11 @@ const ChargerDetail: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, API_URL, navigate]);
+
+  useEffect(() => {
+    fetchCharger();
+  }, [fetchCharger]);
 
   const handleBooking = async () => {
     if (!user) {

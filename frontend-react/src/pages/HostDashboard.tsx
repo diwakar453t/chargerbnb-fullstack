@@ -1,10 +1,8 @@
 import React from 'react';
 import { Container, Typography, Box, Paper, Button, Tabs, Tab } from '@mui/material';
 import { Add, ElectricBolt } from '@mui/icons-material';
-import { useAuth } from '../context/AuthContext';
 
 const HostDashboard: React.FC = () => {
-  const { user } = useAuth();
   const [tabValue, setTabValue] = React.useState(0);
 
   return (

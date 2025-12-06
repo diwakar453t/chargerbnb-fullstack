@@ -11,13 +11,11 @@ import {
     Checkbox,
     Alert,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const AddCharger: React.FC = () => {
-    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [formData, setFormData] = useState({
