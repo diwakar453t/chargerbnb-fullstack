@@ -17,7 +17,7 @@ import HowItWorks from './pages/HowItWorks';
 import Contact from './pages/Contact';
 import ForgotPassword from './pages/ForgotPassword';
 import AddCharger from './pages/AddCharger';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
