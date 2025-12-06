@@ -11,7 +11,6 @@ import ChargerList from './pages/ChargerList';
 import ChargerDetail from './pages/ChargerDetail';
 import Dashboard from './pages/Dashboard';
 import HostDashboard from './pages/HostDashboard';
-import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import About from './pages/About';
