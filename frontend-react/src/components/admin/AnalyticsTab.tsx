@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Grid,
@@ -60,11 +60,7 @@ const AnalyticsTab: React.FC = () => {
     const [cityData, setCityData] = useState<CityData[]>([]);
     const [stats, setStats] = useState<Stats | null>(null);
 
-    useEffect(() => {
-        fetchAnalytics();
-    }, [dateRange]);
-
-    const fetchAnalytics = async () => {
+    const fetchAnalytics = useCallback(async () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('accessToken');
@@ -97,7 +93,11 @@ const AnalyticsTab: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [dateRange]);
+
+    useEffect(() => {
+        fetchAnalytics();
+    }, [fetchAnalytics, dateRange]);
 
     if (loading) {
         return (
