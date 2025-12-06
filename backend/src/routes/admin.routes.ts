@@ -555,26 +555,65 @@ router.get('/stats/summary', async (req: Request, res: Response) => {
 
 /**
  * GET /api/admin/stats/requests-trend
- * Get charger requests trend over time
+ * Get charger requests trend over time (last 7 days by default)
  */
 router.get('/stats/requests-trend', async (req: Request, res: Response) => {
   try {
-    const { from, to } = req.query;
+    const days = parseInt(req.query.days as string) || 7;
 
-    // This is a simplified version - you can enhance with date grouping
-    const chargers = await Charger.findAll({
+    // Get chargers from last N days, grouped by date
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const trend = await Charger.findAll({
       attributes: [
         [sequelize.fn('DATE', sequelize.col('createdAt')), 'date'],
-        [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+        [sequelize.fn('COUNT', sequelize.col('id')), 'requests'],
+        [sequelize.fn('SUM', sequelize.literal("CASE WHEN \"isApproved\" = true THEN 1 ELSE 0 END")), 'approved'],
+        [sequelize.fn('SUM', sequelize.literal("CASE WHEN \"isAvailable\" = false THEN 1 ELSE 0 END")), 'rejected']
       ],
+      where: {
+        createdAt: {
+          [Op.gte]: startDate
+        }
+      },
       group: [sequelize.fn('DATE', sequelize.col('createdAt'))],
-      order: [[sequelize.fn('DATE', sequelize.col('createdAt')), 'DESC']],
-      limit: 30,
+      order: [[sequelize.fn('DATE', sequelize.col('createdAt')), 'ASC']],
       raw: true
     });
 
-    res.json(chargers);
+    res.json({ trend });
   } catch (error: any) {
+    console.error('Error fetching trend:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/admin/stats/chargers-by-city
+ * Get charger distribution by city
+ */
+router.get('/stats/chargers-by-city', async (req: Request, res: Response) => {
+  try {
+    const cityData = await Charger.findAll({
+      attributes: [
+        'city',
+        [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+      ],
+      where: {
+        city: {
+          [Op.ne]: null // Exclude null cities
+        }
+      },
+      group: ['city'],
+      order: [[sequelize.fn('COUNT', sequelize.col('id')), 'DESC']],
+      limit: 10, // Top 10 cities
+      raw: true
+    });
+
+    res.json({ cityData });
+  } catch (error: any) {
+    console.error('Error fetching city data:', error);
     res.status(500).json({ error: error.message });
   }
 });

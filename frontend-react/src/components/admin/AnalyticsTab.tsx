@@ -70,18 +70,26 @@ const AnalyticsTab: React.FC = () => {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            setStats(statsRes.data);
+            // Fetch real trend data
+            const trendRes = await axios.get(`${API_URL}/admin/stats/requests-trend?days=${dateRange}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
 
-            // Don't show fake data - leave charts empty if no real data
-            setTrendData([]);
-            setCityData([]);
+            // Fetch real city distribution data
+            const cityRes = await axios.get(`${API_URL}/admin/stats/chargers-by-city`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setStats(statsRes.data);
+            setTrendData(trendRes.data.trend || []);
+            setCityData(cityRes.data.cityData || []);
         } catch (err: any) {
             console.error('Error fetching analytics:', err);
             setError('Failed to load analytics data');
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [dateRange]);
 
     useEffect(() => {
         fetchAnalytics();
