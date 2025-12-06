@@ -32,7 +32,6 @@ import {
     EvStation,
     Person,
     Report,
-    Star,
     Visibility,
     CheckCircle,
     Cancel,

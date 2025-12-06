@@ -23,7 +23,6 @@ import {
 
 const Footer: React.FC = () => {
     const [email, setEmail] = React.useState('');
-    const [showAdminLink, setShowAdminLink] = React.useState(false);
     const navigate = useNavigate();
 
     const SECRET_PHRASE = 'admin:open-sesame';
@@ -33,7 +32,6 @@ const Footer: React.FC = () => {
 
         // Check for secret admin phrase
         if (email.toLowerCase() === SECRET_PHRASE.toLowerCase()) {
-            setShowAdminLink(true);
             setEmail('');
             // Auto-navigate to admin login after 500ms
             setTimeout(() => {
