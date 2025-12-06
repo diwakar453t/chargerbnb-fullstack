@@ -65,46 +65,27 @@ const AnalyticsTab: React.FC = () => {
             setLoading(true);
             const token = localStorage.getItem('accessToken');
 
-            // Fetch stats summary
+            // Fetch ONLY real stats from database
             const statsRes = await axios.get(`${API_URL}/admin/stats/summary`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
-            // Default trend data for visualization (7 days)
-            const defaultTrendData = [
-                { date: '7 days ago', requests: 2, approved: 1, rejected: 1 },
-                { date: '6 days ago', requests: 3, approved: 2, rejected: 1 },
-                { date: '5 days ago', requests: 1, approved: 1, rejected: 0 },
-                { date: '4 days ago', requests: 4, approved: 3, rejected: 1 },
-                { date: '3 days ago', requests: 2, approved: 1, rejected: 1 },
-                { date: '2 days ago', requests: 3, approved: 2, rejected: 1 },
-                { date: 'Yesterday', requests: 5, approved: 4, rejected: 1 },
-            ];
-
-            // City data based on actual chargers
-            const mockCityData = [
-                { city: 'Mumbai', count: 15 },
-                { city: 'Delhi', count: 12 },
-                { city: 'Bangalore', count: 10 },
-                { city: 'Pune', count: 8 },
-                { city: 'Chennai', count: 7 },
-            ];
-
             setStats(statsRes.data);
-            // Use default trend data for now since backend might not have this endpoint
-            setTrendData(defaultTrendData);
-            setCityData(mockCityData);
+
+            // Don't show fake data - leave charts empty if no real data
+            setTrendData([]);
+            setCityData([]);
         } catch (err: any) {
             console.error('Error fetching analytics:', err);
             setError('Failed to load analytics data');
         } finally {
             setLoading(false);
         }
-    }, [dateRange]);
+    }, []);
 
     useEffect(() => {
         fetchAnalytics();
-    }, [fetchAnalytics, dateRange]);
+    }, [fetchAnalytics]);
 
     if (loading) {
         return (
@@ -228,36 +209,44 @@ const AnalyticsTab: React.FC = () => {
                         <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
                             Charger Requests Trend
                         </Typography>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <LineChart data={trendData}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="date" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Line
-                                    type="monotone"
-                                    dataKey="requests"
-                                    stroke="#2196F3"
-                                    strokeWidth={2}
-                                    name="Total Requests"
-                                />
-                                <Line
-                                    type="monotone"
-                                    dataKey="approved"
-                                    stroke="#2C5F2D"
-                                    strokeWidth={2}
-                                    name="Approved"
-                                />
-                                <Line
-                                    type="monotone"
-                                    dataKey="rejected"
-                                    stroke="#FF6B35"
-                                    strokeWidth={2}
-                                    name="Rejected"
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
+                        {trendData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <LineChart data={trendData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="date" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="requests"
+                                        stroke="#2196F3"
+                                        strokeWidth={2}
+                                        name="Total Requests"
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="approved"
+                                        stroke="#2C5F2D"
+                                        strokeWidth={2}
+                                        name="Approved"
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="rejected"
+                                        stroke="#FF6B35"
+                                        strokeWidth={2}
+                                        name="Rejected"
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
+                                <Typography variant="body1" color="text.secondary">
+                                    No historical trend data available yet
+                                </Typography>
+                            </Box>
+                        )}
                     </Paper>
                 </Grid>
 
@@ -295,16 +284,24 @@ const AnalyticsTab: React.FC = () => {
                         <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
                             Chargers by City
                         </Typography>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={cityData}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="city" />
-                                <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="count" fill="#2196F3" name="Number of Chargers" />
-                            </BarChart>
-                        </ResponsiveContainer>
+                        {cityData.length > 0 ? (
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart data={cityData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="city" />
+                                    <YAxis />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Bar dataKey="count" fill="#2196F3" name="Number of Chargers" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        ) : (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
+                                <Typography variant="body1" color="text.secondary">
+                                    No city data available yet
+                                </Typography>
+                            </Box>
+                        )}
                     </Paper>
                 </Grid>
             </Grid>
