@@ -12,6 +12,8 @@ import ChargerDetail from './pages/ChargerDetail';
 import Dashboard from './pages/Dashboard';
 import HostDashboard from './pages/HostDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminLogin from './pages/AdminLogin';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import About from './pages/About';
 import HowItWorks from './pages/HowItWorks';
 import Contact from './pages/Contact';
@@ -67,6 +69,19 @@ function AppRoutes() {
       <Route path="/contact" element={<Contact />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/add-charger" element={<ProtectedRoute><AddCharger /></ProtectedRoute>} />
+
+      {/* Admin Routes */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute requiredRole="ADMIN">
+            <AdminDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* User Dashboards */}
       <Route
         path="/dashboard"
         element={

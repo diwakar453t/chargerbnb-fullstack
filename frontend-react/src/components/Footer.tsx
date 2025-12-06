@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
     Box,
     Container,
@@ -23,9 +23,26 @@ import {
 
 const Footer: React.FC = () => {
     const [email, setEmail] = React.useState('');
+    const [showAdminLink, setShowAdminLink] = React.useState(false);
+    const navigate = useNavigate();
+
+    const SECRET_PHRASE = 'admin:open-sesame';
 
     const handleNewsletterSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Check for secret admin phrase
+        if (email.toLowerCase() === SECRET_PHRASE.toLowerCase()) {
+            setShowAdminLink(true);
+            setEmail('');
+            // Auto-navigate to admin login after 500ms
+            setTimeout(() => {
+                navigate('/admin/login');
+            }, 500);
+            return;
+        }
+
+        // Regular newsletter subscription
         // TODO: Implement newsletter subscription
         alert('Thank you for subscribing!');
         setEmail('');
