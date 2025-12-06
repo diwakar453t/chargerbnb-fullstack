@@ -39,6 +39,8 @@ import {
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ReportsTab from '../components/admin/ReportsTab';
+import ReviewsTab from '../components/admin/ReviewsTab';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -281,7 +283,7 @@ const AdminDashboard: React.FC = () => {
                 </Tabs>
             </Paper>
 
-            {/* Chargers Tab */}
+            {/* Tab Content */}
             {tabValue === 0 && (
                 <Box>
                     <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
@@ -370,21 +372,11 @@ const AdminDashboard: React.FC = () => {
             )}
 
             {/* Other tabs placeholder */}
-            {tabValue === 1 && (
-                <Paper sx={{ p: 4, textAlign: 'center' }}>
-                    <Typography variant="h6" color="text.secondary">
-                        Reports management coming soon...
-                    </Typography>
-                </Paper>
-            )}
+            {/* Reports Tab */}
+            {tabValue === 1 && <ReportsTab />}
 
-            {tabValue === 2 && (
-                <Paper sx={{ p: 4, textAlign: 'center' }}>
-                    <Typography variant="h6" color="text.secondary">
-                        Reviews moderation coming soon...
-                    </Typography>
-                </Paper>
-            )}
+            {/* Reviews Tab */}
+            {tabValue === 2 && <ReviewsTab />}
 
             {tabValue === 3 && (
                 <Paper sx={{ p: 4, textAlign: 'center' }}>
