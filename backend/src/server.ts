@@ -10,6 +10,7 @@ import paymentRoutes from './routes/payment.routes';
 import reviewRoutes from './routes/review.routes';
 import uploadRoutes from './routes/upload.routes';
 import adminRoutes from './routes/admin.routes';
+import hostRoutes from './routes/host.routes';
 import otpRoutes from './routes/otp.routes';
 import setupRoutes from './routes/setup.routes';
 
@@ -38,6 +39,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/host', hostRoutes);
 app.use('/api/setup', setupRoutes);
 
 // Health check endpoint - Last deployed: 2025-12-06T10:21:04+05:30

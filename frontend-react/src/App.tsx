@@ -18,6 +18,9 @@ import HowItWorks from './pages/HowItWorks';
 import Contact from './pages/Contact';
 import ForgotPassword from './pages/ForgotPassword';
 import AddCharger from './pages/AddCharger';
+import TermsAndConditions from './pages/TermsAndConditions';
+import FAQ from './pages/FAQ';
+import Pricing from './pages/Pricing';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
@@ -98,6 +101,9 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route path="/terms" element={<TermsAndConditions />} />
+      <Route path="/faq" element={<FAQ />} />
+      <Route path="/pricing" element={<Pricing />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

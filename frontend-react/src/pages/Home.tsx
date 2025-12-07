@@ -50,7 +50,7 @@ const Home: React.FC = () => {
         {/* Hero Section */}
         <Box
           sx={{
-            background: 'linear-gradient(135deg, rgba(255,107,53,0.95) 0%, rgba(247,147,30,0.95) 100%), url(/images/ev_charging_hero_1764948133142.png)',
+            background: 'linear-gradient(135deg, rgba(44,95,45,0.85) 0%, rgba(255,107,53,0.85) 100%), url(/images/hero.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             color: 'white',
@@ -188,42 +188,112 @@ const Home: React.FC = () => {
           </Grid>
         </Container>
 
-        {/* CTA Section with Image */}
-        <Box sx={{ bgcolor: '#f8f9fa', py: 8 }}>
+        {/* Network Section with Scroll Animation */}
+        <Box sx={{ bgcolor: '#E8F5E9', py: 8 }}>
           <Container>
             <Grid container spacing={6} alignItems="center">
               <Grid size={{ xs: 12, md: 6 }}>
-                <img
-                  src="/images/ev_car_modern_1764948205388.png"
-                  alt="Modern EV"
-                  style={{ width: '100%', borderRadius: '16px' }}
-                />
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <Typography variant="h3" gutterBottom sx={{ fontWeight: 700, color: '#2C5F2D' }}>
+                    Join India's Largest EV Charging Network
+                  </Typography>
+                  <Typography variant="body1" paragraph sx={{ fontSize: '1.1rem', mb: 3, color: 'text.secondary' }}>
+                    Connect with thousands of EV owners across 100+ cities. Our peer-to-peer network makes charging accessible, affordable, and convenient.
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={() => navigate('/chargers')}
+                      sx={{ bgcolor: '#2C5F2D', px: 4, py: 1.5, '&:hover': { bgcolor: '#1e4620' } }}
+                    >
+                      Find Chargers
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      onClick={() => navigate('/how-it-works')}
+                      sx={{ borderColor: '#2C5F2D', color: '#2C5F2D', px: 4, py: 1.5 }}
+                    >
+                      Learn More
+                    </Button>
+                  </Box>
+                </motion.div>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
-                  Join India's Largest EV Charging Network
-                </Typography>
-                <Typography variant="body1" paragraph sx={{ fontSize: '1.1rem', mb: 3 }}>
-                  Become part of the electric revolution. List your charger or find charging stations across 100+ cities in India.
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                <motion.div
+                  initial={{ opacity: 0, x: 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <img
+                    src="/images/network.png"
+                    alt="EV Charging Network"
+                    style={{ width: '100%', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}
+                  />
+                </motion.div>
+              </Grid>
+            </Grid>
+          </Container>
+        </Box>
+
+        {/* Host Earnings Section with Scroll Animation */}
+        <Box sx={{ bgcolor: '#FFF3E0', py: 8 }}>
+          <Container>
+            <Grid container spacing={6} alignItems="center">
+              <Grid size={{ xs: 12, md: 6 }} sx={{ order: { xs: 2, md: 1 } }}>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <img
+                    src="/images/earnings.png"
+                    alt="Host Earnings"
+                    style={{ width: '100%', borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }}
+                  />
+                </motion.div>
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }} sx={{ order: { xs: 1, md: 2 } }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <Typography variant="h3" gutterBottom sx={{ fontWeight: 700, color: '#FF6B35' }}>
+                    Earn Money from Your Charger
+                  </Typography>
+                  <Typography variant="body1" paragraph sx={{ fontSize: '1.1rem', mb: 3, color: 'text.secondary' }}>
+                    Turn your idle EV charger into a revenue stream. Hosts earn ₹3,000-₹8,000 per month on average by sharing their charging stations.
+                  </Typography>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#FF6B35', mb: 1 }}>
+                      ✓ Set your own pricing
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#FF6B35', mb: 1 }}>
+                      ✓ Control your availability
+                    </Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 600, color: '#FF6B35', mb: 1 }}>
+                      ✓ Get paid automatically
+                    </Typography>
+                  </Box>
                   <Button
                     variant="contained"
                     size="large"
                     onClick={() => navigate('/signup')}
                     sx={{ bgcolor: '#FF6B35', px: 4, py: 1.5, '&:hover': { bgcolor: '#e55a25' } }}
                   >
-                    Get Started
+                    Become a Host
                   </Button>
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    onClick={() => navigate('/how-it-works')}
-                    sx={{ borderColor: '#FF6B35', color: '#FF6B35', px: 4, py: 1.5 }}
-                  >
-                    Learn More
-                  </Button>
-                </Box>
+                </motion.div>
               </Grid>
             </Grid>
           </Container>

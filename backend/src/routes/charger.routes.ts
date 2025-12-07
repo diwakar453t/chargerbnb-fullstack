@@ -2,22 +2,85 @@ import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import Charger from '../models/postgres/Charger.model';
 import { authenticateToken } from '../middleware/auth.middleware';
+import { Op } from 'sequelize';
 
 const router = Router();
 
-// Get all chargers (with optional filters)
+// Get all chargers (with enhanced filters) - ONLY approved and available
 router.get('/', async (req, res) => {
   try {
-    const { city, state, chargerType, available } = req.query;
-    const where: any = {};
+    const {
+      city,
+      state,
+      chargerType,
+      minPrice,
+      maxPrice,
+      minRating,
+      sortBy = 'createdAt',
+      sortOrder = 'DESC',
+      page = 1,
+      limit = 20,
+      search
+    } = req.query;
 
+    const where: any = {
+      // ONLY show approved and available chargers to users
+      isApproved: true,
+      isAvailable: true
+    };
+
+    // Location filters
     if (city) where.city = city;
     if (state) where.state = state;
-    if (chargerType) where.chargerType = chargerType;
-    if (available) where.isAvailable = available === 'true';
 
-    const chargers = await Charger.findAll({ where });
-    res.json({ chargers });
+    // Charger type filter
+    if (chargerType) where.chargerType = chargerType;
+
+    // Price filters
+    if (minPrice || maxPrice) {
+      where.pricePerHour = {};
+      if (minPrice) where.pricePerHour[Op.gte] = Number(minPrice);
+      if (maxPrice) where.pricePerHour[Op.lte] = Number(maxPrice);
+    }
+
+    // Search filter (title, description, city)
+    if (search) {
+      where[Op.or] = [
+        { title: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
+        { city: { [Op.iLike]: `%${search}%` } }
+      ];
+    }
+
+    // Rating filter would require joining with reviews table
+    // For now, we'll handle this in a separate endpoint if needed
+
+    const offset = (Number(page) - 1) * Number(limit);
+
+    // Determine sort field and order
+    const validSortFields = ['pricePerHour', 'createdAt', 'title', 'city'];
+    const sortField = validSortFields.includes(sortBy as string) ? sortBy : 'createdAt';
+    const order: any = [[sortField, sortOrder === 'ASC' ? 'ASC' : 'DESC']];
+
+    const { count, rows: chargers } = await Charger.findAndCountAll({
+      where,
+      limit: Number(limit),
+      offset,
+      order,
+      attributes: {
+        exclude: ['hostId'] // Don't expose host ID to general users
+      }
+    });
+
+    res.json({
+      chargers,
+      pagination: {
+        total: count,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(count / Number(limit))
+      }
+    });
   } catch (error: any) {
     console.error('Get chargers error:', error);
     res.status(500).json({ error: 'Failed to fetch chargers' });
