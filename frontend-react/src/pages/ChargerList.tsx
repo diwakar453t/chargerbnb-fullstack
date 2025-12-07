@@ -148,7 +148,7 @@ const ChargerList: React.FC = () => {
 
         <Grid container spacing={2}>
           {/* Search */}
-          <Grid size={{ xs: 12 }} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <TextField
               fullWidth
               placeholder="Search by name, city..."
@@ -162,7 +162,7 @@ const ChargerList: React.FC = () => {
           </Grid>
 
           {/* City Filter */}
-          <Grid size={{ xs: 12 }} sm={6} md={2}>
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
             <FormControl fullWidth size="small">
               <InputLabel>City</InputLabel>
               <Select value={city} label="City" onChange={handleCityChange}>
@@ -178,7 +178,7 @@ const ChargerList: React.FC = () => {
           </Grid>
 
           {/* State Filter */}
-          <Grid size={{ xs: 12 }} sm={6} md={2}>
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
             <FormControl fullWidth size="small">
               <InputLabel>State</InputLabel>
               <Select value={state} label="State" onChange={handleStateChange}>
@@ -193,7 +193,7 @@ const ChargerList: React.FC = () => {
           </Grid>
 
           {/* Charger Type Filter */}
-          <Grid size={{ xs: 12 }} sm={6} md={2}>
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
             <FormControl fullWidth size="small">
               <InputLabel>Charger Type</InputLabel>
               <Select value={chargerType} label="Charger Type" onChange={handleChargerTypeChange}>
@@ -207,7 +207,7 @@ const ChargerList: React.FC = () => {
           </Grid>
 
           {/* Sort By */}
-          <Grid size={{ xs: 12 }} sm={6} md={2}>
+          <Grid size={{ xs: 12, sm: 6, md: 2 }}>
             <FormControl fullWidth size="small">
               <InputLabel>Sort By</InputLabel>
               <Select value={sortBy} label="Sort By" onChange={handleSortChange}>
@@ -254,7 +254,7 @@ const ChargerList: React.FC = () => {
 
           <Grid container spacing={3}>
             {chargers.map((charger, index) => (
-              <Grid size={{ xs: 12 }} sm={6} md={4} key={charger.id}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={charger.id}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}

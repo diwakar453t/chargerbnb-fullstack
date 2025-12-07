@@ -184,7 +184,7 @@ const HostBookings: React.FC = () => {
                                     </Box>
 
                                     <Grid container spacing={2} sx={{ mt: 1 }}>
-                                        <Grid size={{ xs: 12 }} sm={4}>
+                                        <Grid size={{ xs: 12, sm: 4 }}>
                                             <Typography variant="caption" color="text.secondary" display="block">
                                                 Start Time
                                             </Typography>
@@ -192,7 +192,7 @@ const HostBookings: React.FC = () => {
                                                 {format(new Date(booking.startTime), 'PPp')}
                                             </Typography>
                                         </Grid>
-                                        <Grid size={{ xs: 12 }} sm={4}>
+                                        <Grid size={{ xs: 12, sm: 4 }}>
                                             <Typography variant="caption" color="text.secondary" display="block">
                                                 End Time
                                             </Typography>
@@ -200,7 +200,7 @@ const HostBookings: React.FC = () => {
                                                 {format(new Date(booking.endTime), 'PPp')}
                                             </Typography>
                                         </Grid>
-                                        <Grid size={{ xs: 12 }} sm={4}>
+                                        <Grid size={{ xs: 12, sm: 4 }}>
                                             <Typography variant="caption" color="text.secondary" display="block">
                                                 Total Amount
                                             </Typography>
