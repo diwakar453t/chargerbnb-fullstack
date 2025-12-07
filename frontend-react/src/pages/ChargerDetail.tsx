@@ -31,8 +31,8 @@ const ChargerDetail: React.FC = () => {
 
   const fetchCharger = useCallback(async () => {
     try {
-      const response = await axios.get(`${API_URL}/chargers/public/${id}`);
-      setCharger(response.data);
+      const response = await axios.get(`${API_URL}/chargers/${id}`);
+      setCharger(response.data.charger || response.data);
     } catch (error) {
       toast.error('Failed to load charger details');
       navigate('/chargers');
@@ -51,9 +51,43 @@ const ChargerDetail: React.FC = () => {
       return;
     }
 
+    if (!startTime || !endTime) {
+      toast.error('Please select start and end time');
+      return;
+    }
+
+
+
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    if (start >= end) {
+      toast.error('End time must be after start time');
+      return;
+    }
+
+    if (start < new Date()) {
+      toast.error('Cannot book in the past');
+      return;
+    }
+
     try {
-      // Implement booking logic
-      toast.success('Booking created successfully!');
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${API_URL}/bookings`,
+        {
+          chargerId: id,
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      toast.success('Booking created successfully! Host will review your request.');
+      setStartTime('');
+      setEndTime('');
+      navigate('/my-bookings');
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Booking failed');
     }

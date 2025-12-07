@@ -18,6 +18,8 @@ import HowItWorks from './pages/HowItWorks';
 import Contact from './pages/Contact';
 import ForgotPassword from './pages/ForgotPassword';
 import AddCharger from './pages/AddCharger';
+import MyBookings from './pages/MyBookings';
+import HostBookings from './pages/HostBookings';
 import TermsAndConditions from './pages/TermsAndConditions';
 import FAQ from './pages/FAQ';
 import Pricing from './pages/Pricing';
@@ -98,6 +100,22 @@ function AppRoutes() {
         element={
           <ProtectedRoute requiredRole="HOST">
             <HostDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-bookings"
+        element={
+          <ProtectedRoute>
+            <MyBookings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/host/bookings"
+        element={
+          <ProtectedRoute requiredRole="HOST">
+            <HostBookings />
           </ProtectedRoute>
         }
       />
