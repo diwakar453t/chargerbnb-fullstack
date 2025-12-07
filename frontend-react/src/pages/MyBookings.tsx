@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Container,
     Typography,
@@ -35,11 +35,7 @@ const MyBookings: React.FC = () => {
     const navigate = useNavigate();
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-    useEffect(() => {
-        fetchBookings();
-    }, []);
-
-    const fetchBookings = async () => {
+    const fetchBookings = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
             const response = await axios.get(`${API_URL}/bookings`, {
@@ -51,7 +47,11 @@ const MyBookings: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [API_URL]);
+
+    useEffect(() => {
+        fetchBookings();
+    }, [fetchBookings]);
 
     const handleCancelBooking = async (id: number) => {
         if (!window.confirm('Are you sure you want to cancel this booking?')) {

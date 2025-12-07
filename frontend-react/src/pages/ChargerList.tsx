@@ -21,7 +21,7 @@ import {
   Paper,
   SelectChangeEvent,
 } from '@mui/material';
-import { LocationOn, Bolt, Star, FilterList } from '@mui/icons-material';
+import { LocationOn, Bolt, FilterList } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 

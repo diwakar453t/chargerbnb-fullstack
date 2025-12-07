@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Container,
     Typography,
@@ -42,11 +42,7 @@ const HostBookings: React.FC = () => {
     const [filter, setFilter] = useState<string>('all');
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-    useEffect(() => {
-        fetchBookings();
-    }, [filter]);
-
-    const fetchBookings = async () => {
+    const fetchBookings = useCallback(async () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
@@ -60,7 +56,11 @@ const HostBookings: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [filter, API_URL]);
+
+    useEffect(() => {
+        fetchBookings();
+    }, [fetchBookings]);
 
     const handleAcceptBooking = async (id: number) => {
         try {
