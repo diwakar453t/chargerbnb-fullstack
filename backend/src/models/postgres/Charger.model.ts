@@ -222,7 +222,24 @@ Charger.init(
   {
     sequelize,
     tableName: 'chargers',
-    timestamps: true
+    timestamps: true,
+    hooks: {
+      // Automatically enforce status consistency
+      beforeSave: (charger: Charger) => {
+        // Rule: If charger is not available (suspended/rejected), it cannot be approved
+        if (!charger.isAvailable && charger.isApproved) {
+          charger.isApproved = false;
+          console.log(`🔧 Auto-corrected: Charger ${charger.id} set isApproved=false (isAvailable=false)`);
+        }
+      },
+      beforeUpdate: (charger: Charger) => {
+        // Rule: If charger is not available (suspended/rejected), it cannot be approved
+        if (!charger.isAvailable && charger.isApproved) {
+          charger.isApproved = false;
+          console.log(`🔧 Auto-corrected: Charger ${charger.id} set isApproved=false (isAvailable=false)`);
+        }
+      }
+    }
   }
 );
 

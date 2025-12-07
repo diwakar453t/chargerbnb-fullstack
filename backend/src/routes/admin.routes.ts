@@ -199,7 +199,9 @@ router.patch('/chargers/:id/suspend', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Charger not found' });
     }
 
+    // When suspending, mark as both unavailable AND not approved
     charger.isAvailable = false;
+    charger.isApproved = false;
     await charger.save();
 
     // Log admin action
@@ -646,6 +648,69 @@ router.get('/activity-log', async (req: Request, res: Response) => {
       }
     });
   } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// ============================================
+// DATABASE MAINTENANCE
+// ============================================
+
+/**
+ * POST /api/admin/fix-statuses
+ * Fix charger status inconsistencies in database
+ * Ensures isApproved and isAvailable are correctly mapped
+ */
+router.post('/fix-statuses', async (req: Request, res: Response) => {
+  try {
+    // Fix 1: Chargers that are not available should also not be approved
+    const [updatedCount] = await Charger.update(
+      { isApproved: false },
+      {
+        where: {
+          isAvailable: false,
+          isApproved: true
+        }
+      }
+    );
+
+    // Get updated stats
+    const pending = await Charger.count({
+      where: { isApproved: false, isAvailable: true }
+    });
+
+    const approved = await Charger.count({
+      where: { isApproved: true, isAvailable: true }
+    });
+
+    const suspended = await Charger.count({
+      where: { isAvailable: false }
+    });
+
+    // Log admin action
+    await AdminAction.create({
+      adminId: req.user!.userId,
+      actionType: 'OTHER',
+      targetTable: 'chargers',
+      targetId: 0,
+      reason: 'Fixed charger status inconsistencies',
+      metadata: {
+        fixedCount: updatedCount,
+        stats: { pending, approved, suspended }
+      }
+    });
+
+    res.json({
+      message: 'Database statuses fixed successfully',
+      fixedCount: updatedCount,
+      currentStats: {
+        pending,
+        approved,
+        suspended
+      }
+    });
+  } catch (error: any) {
+    console.error('Error fixing statuses:', error);
     res.status(500).json({ error: error.message });
   }
 });
