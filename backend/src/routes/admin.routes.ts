@@ -199,7 +199,9 @@ router.patch('/chargers/:id/suspend', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Charger not found' });
     }
 
+    // When suspending, mark as both unavailable AND not approved
     charger.isAvailable = false;
+    charger.isApproved = false;
     await charger.save();
 
     // Log admin action
